@@ -31,6 +31,7 @@ if __name__ == "__main__":
     ### Train ###
     trainer = pl.Trainer(
         accelerator="gpu",
+        gpus=1,
         max_epochs=5,
         auto_scale_batch_size=True,
     )

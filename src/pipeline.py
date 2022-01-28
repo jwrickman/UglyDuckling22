@@ -4,6 +4,7 @@ import os
 import numpy as np
 import torch
 import torchvision as tv
+from torchvision import transforms
 import pytorch_lightning as pl
 from sklearn.model_selection import train_test_split
 from PIL import Image
@@ -29,10 +30,10 @@ class MoleMapDataset(Dataset):
         image = Image.open(self.image_paths[idx]).convert("RGB")
         image = self.transform(image)
 
-        return image
+        return image, image
 
 
-class MoleMapDataModule(pl.DataModule):
+class MoleMapDataModule(pl.LightningDataModule):
 
     def __init__(self, image_paths, batch_size, image_size, num_workers, persistent_workers):
         self.image_paths = image_paths
@@ -48,10 +49,10 @@ class MoleMapDataModule(pl.DataModule):
         ])
 
 
-    def setup(self):
+    def setup(self, stage=None):
         train_paths, val_paths = train_test_split(self.image_paths, test_size=0.2)
-        self.train_dataset = MoleMapDataset(train_paths)
-        self.val_dataset = MoleMapDataset(val_paths)
+        self.train_dataset = MoleMapDataset(train_paths, self.transform)
+        self.val_dataset = MoleMapDataset(val_paths, self.transform)
 
 
     def train_dataloader(self):
